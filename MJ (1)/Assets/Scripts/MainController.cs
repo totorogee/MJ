@@ -20,6 +20,8 @@ public class MainController : MonoBehaviour {
     public int trial = 0;
     public bool shown = false;
 
+    public WinCheck win;
+
     private void Awake()
     {
         if(Instance == null)
@@ -30,58 +32,80 @@ public class MainController : MonoBehaviour {
         {
             Destroy(this);
         }
+
+        win = new WinCheck(Generate17(true));
+
     }
 
     // Use this for initialization
     void Start ()
     {
         Tiles.Icons = new List<Sprite>( Resources.LoadAll<Sprite>(IconPath) );
-        Tiles.ClosedIcon = Resources.Load<Sprite>(IconPath + "MJTiles-0");
+        Tiles.ClosedIcon = Resources.Load<Sprite>(IconPath + "MJTiles-32");
 
         for (int i = 0; i < 145; i++)
         {
             Tiles t = new Tiles(i);
             Tile.Add(t);
         }
-        Debug.Log(DateTime.Now);
-        Debug.Log(DateTime.Now - new DateTime(2000, 1, 1));
-        Debug.Log( (int) (DateTime.Now - new DateTime(2000, 1, 1)).TotalSeconds );
-        Debug.Log(int.MaxValue);
+    //    Debug.Log(DateTime.Now);
+    //    Debug.Log(DateTime.Now - new DateTime(2000, 1, 1));
+     //   Debug.Log( (int) (DateTime.Now - new DateTime(2000, 1, 1)).TotalSeconds );
+     //   Debug.Log(int.MaxValue);
     }
 
     private void Update()
-    {
-
-
+    { 
         if (!stop)
         {
             Main17 = Generate17(true);
+            win = new WinCheck(Main17);
 
-            WinCheck win = new WinCheck(Main17);
-            Debug.Log(win.IsWin);
-
-            if (win.IsWin)
+            if( (win.IsWin) && (win.combinations.Count >=3))
             {
                 stop = true;
             }
 
             trial++;
 
-            if (trial > 100)
+            if (trial > 1000)
             {
                 stop = true;
             }
         }
 
         if (stop && !shown)
-        {
-            foreach (var item in Main17)
-            {
-                Debug.Log(item.GetSuitType() + "  " + item.GetRank());
-            }
+        { 
+            Show(Main17);
+            Show(win.combinations);
             shown = true;
         }
+    }
 
+    public void Show(List<Tiles> tiles, float row = 0f)
+    {
+        float x = Tiles.Icons[0].bounds.size.x * 1.1f;
+        float y = Tiles.Icons[0].bounds.size.y * 1.1f;
+
+        for (int i = 0; i < tiles.Count ; i++)
+        {
+            GameObject go = new GameObject();
+            SpriteRenderer sp = go.AddComponent<SpriteRenderer>();
+            sp.sprite = tiles[i].GetIcon();
+
+            int space = (i + 1 ) / 3; 
+            go.transform.position = new Vector3(x*i + space * x*0.1f, y * row, 0f);
+        }
+    }
+
+    public void Show(List<List<Tiles>> winningHands)
+    {
+        float y = 0f;
+        foreach (var item in winningHands)
+        {
+            y++;
+            Show(item, y);
+        }
     }
 
     private void ShowOne(Tiles tile , Vector3 position, Transform parent = null)

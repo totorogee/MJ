@@ -93,10 +93,17 @@ public class WinCheck
                 if (CheckWinWithoutEye())
                 {
                     IsWin = true;
-                    combinations.Add(checkedTiles);
+
+                    List<Tiles> temp = new List<Tiles>();
+                    foreach (var item in checkedTiles)
+                    {
+                        temp.Add(item);
+                    }
+                    combinations.Add(temp);
 
                     if (linkedTripletLevel >= 3)
                     {
+                        Debug.Log(linkedTripletLevel); // ?
                         for (int n = 0; n <= (linkedTripletLevel - 3); n++)
                         {
                             combinations.Add(LinkedTripletSwitch(checkedTiles, n));
@@ -162,7 +169,7 @@ public class WinCheck
                 break;
             }
 
-            if (debugTry > 100)
+            if (debugTry > 1000)
             {
                 Debug.Log("Looped  " + i);
                 return false;

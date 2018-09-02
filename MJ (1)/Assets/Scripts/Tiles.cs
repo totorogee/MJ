@@ -61,5 +61,10 @@ public class Tiles
         return -1;
     }
 
+    public Sprite GetIcon(bool closed = false)
+    {
+        return Icons[(TileID-1) /4 ];
+    }
+
 }
 
