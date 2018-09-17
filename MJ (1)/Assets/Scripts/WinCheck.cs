@@ -86,6 +86,7 @@ public class WinCheck
                 }
 
                 checkedTiles.Clear();
+                linkedTripletLevel = 0;
 
                 MarkTileAsCheck(suitWithEyes, i);
                 MarkTileAsCheck(suitWithEyes, i);
@@ -103,7 +104,6 @@ public class WinCheck
 
                     if (linkedTripletLevel >= 3)
                     {
-                        Debug.Log(linkedTripletLevel); // ?
                         for (int n = 0; n <= (linkedTripletLevel - 3); n++)
                         {
                             combinations.Add(LinkedTripletSwitch(checkedTiles, n));
@@ -234,7 +234,7 @@ public class WinCheck
         return false;
     }
 
-    // Picking out special case such as ( 555 666 777 ) 
+    // Picking out special case such as ( 555 666 777 ) Bugged
     private int TryMarkAsLinkedTriplet(SuitType suit, int rank)
     {
         if (suit == SuitType.Honor)
@@ -252,12 +252,13 @@ public class WinCheck
         int link = 0;
         for (int i = rank; i < 9; i++)
         {
-            if (TryMarkAsTriplet(suit, rank))
+            if (TryMarkAsTriplet(suit, i))
             {
                 link++;
             }
             else
             {
+                Debug.Log("here " + link);
                 return link;
             }
         }
@@ -337,22 +338,25 @@ public class WinCheck
     {
         List<Tiles> result = new List<Tiles>();
 
-        int i = 0;
+        int pos = 0;
 
-        for (i = 0; i < tiles.Count; i++)
+        for (int i = 0; i < tiles.Count; i++)
         {
             if (tiles[i].GetSuitType() == linkedTripletAtSuit && tiles[i].GetRank() == linkedTripletAtRank + n)
             {
+                pos = i;
                 break;
             }
         }
 
+        Debug.Log(linkedTripletAtSuit + " " + linkedTripletAtRank + " " + pos);
+
         for (int j = 0; j < tiles.Count; j++)
         {
-            if (j >=i && j <= i + 8)
+            if (j >=pos && j <= pos + 8)
             {
-                int k = j - i;
-                k = k / 3 + k % 3 * 3;  // j-i : 012 345 678 => k : 036 147 258
+                int k = j - pos;
+                k = k / 3 + k % 3 * 3 + pos;  // j-pos : 012 345 678 => k : 036 147 258
                 result.Add(tiles[k]);
             }
             else
